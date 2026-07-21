@@ -59,24 +59,38 @@
             <small class="text-body-secondary">Maximum file size: 5MB. Supported formats: JPEG, PNG, GIF, WebP.</small>
         </div>
         <hr>
-        <!-- Password Reset Section (Placeholder) -->
+        <!-- Change Password Section -->
         <div class="mb-4">
             <h5>Change Password</h5>
-            <p class="text-body-secondary">Password reset coming in a future tutorial.</p>
-            <form>
+            <form id="changePasswordForm">
                 <div class="mb-3">
-                    <label class="form-label">Current Password</label>
-                    <input type="password" class="form-control" disabled>
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <input type="password"
+                           class="form-control"
+                           id="currentPassword"
+                           name="current_password"
+                           required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">New Password</label>
-                    <input type="password" class="form-control" disabled>
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password"
+                           class="form-control"
+                           id="newPassword"
+                           name="new_password"
+                           required
+                           minlength="8">
+                    <div class="form-text">Password must be at least 8 characters.</div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Confirm New Password</label>
-                    <input type="password" class="form-control" disabled>
+                    <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                    <input type="password"
+                           class="form-control"
+                           id="confirmNewPassword"
+                           name="confirm_new_password"
+                           required
+                           minlength="8">
                 </div>
-                <button type="submit" class="btn btn-primary" disabled>Change Password</button>
+                <button type="submit" class="btn btn-primary">Change Password</button>
             </form>
         </div>
         <hr>
@@ -349,6 +363,63 @@
         const error = await response.json();
         document.getElementById('errorMessage').textContent = getErrorMessage(error);
         hideModal('deleteAccountModal');
+        showModal('errorModal');
+      }
+    } catch (error) {
+      document.getElementById('errorMessage').textContent =
+        'Network error. Please check your connection and try again.';
+      showModal('errorModal');
+    }
+  });
+
+  // Change Password Form Handler
+  const changePasswordForm = document.getElementById('changePasswordForm');
+  changePasswordForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const token = getToken();
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+    if (newPassword !== confirmNewPassword) {
+      document.getElementById('errorMessage').textContent = 'New passwords do not match.';
+      showModal('errorModal');
+      return;
+    }
+
+    const formData = new FormData(changePasswordForm);
+    const body = {
+      current_password: formData.get('current_password'),
+      new_password: formData.get('new_password'),
+    };
+
+    try {
+      const response = await fetch(`/api/users/${currentUserId}/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (response.status === 401) {
+        window.location.href = '/login';
+        return;
+      }
+
+      if (response.ok) {
+        changePasswordForm.reset();
+        document.getElementById('successMessage').textContent = 'Password changed successfully!';
+        showModal('successModal');
+      } else {
+        const error = await response.json();
+        document.getElementById('errorMessage').textContent = getErrorMessage(error);
         showModal('errorModal');
       }
     } catch (error) {
