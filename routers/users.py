@@ -505,6 +505,10 @@ async def forgot_password(
         # Build reset URL and schedule the email as a background task
         base_url = str(request.base_url).rstrip("/")
         reset_url = f"{base_url}/reset-password?token={raw_token}"
+        print(f"\n=======================================================")
+        print(f"PASSWORD RESET LINK FOR {user.email}:")
+        print(f"{reset_url}")
+        print(f"=======================================================\n")
         background_tasks.add_task(send_password_reset_email, user.email, reset_url)
 
     # Always return 202 to prevent user-enumeration
