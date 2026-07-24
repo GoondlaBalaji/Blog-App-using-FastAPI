@@ -12,10 +12,11 @@ from sqlalchemy import delete, select, update
 
 import models
 from database import AsyncSessionLocal, engine
-from image_utils import PROFILE_PICS_DIR
 from main import app
 
+PROFILE_PICS_DIR = Path("media/profile_pics")
 POPULATE_IMAGES_DIR = Path("populate_images")
+
 
 USERS = [
     {
