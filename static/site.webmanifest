@@ -1,7 +1,7 @@
 {
-  "name": "Casual Blog",
-  "short_name": "Casual Blog",
-  "description": "Casual Blog Application",
+  "name": "SPARK",
+  "short_name": "SPARK",
+  "description": "Student Platform for Academic Resources & Knowledge",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
